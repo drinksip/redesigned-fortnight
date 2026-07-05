@@ -1,11 +1,11 @@
-# Builds the site and publishes it to GitHub Pages automatically on every push.
-#
-# Setup (one-time, in your repo settings):
-#   Settings → Pages → Build and deployment → Source: "GitHub Actions"
-#
-# After that, every push to main rebuilds & deploys automatically.
-
 name: Build & Deploy
+
+# Builds the site and pushes it to a `gh-pages` branch, which GitHub Pages serves.
+# This avoids the flaky actions/deploy-pages API entirely.
+#
+# ONE-TIME SETUP (in your repo):
+#   Settings → Pages → Build and deployment → Source → "Deploy from a branch"
+#   Branch: gh-pages  /  folder: /(root)  →  Save
 
 on:
   push:
@@ -13,16 +13,10 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
+  contents: write
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,19 +27,11 @@ jobs:
           cache: npm
 
       - run: npm ci
-
       - run: npm run build
 
-      - uses: actions/upload-pages-artifact@v3
+      # Push the contents of dist/ to the gh-pages branch
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
