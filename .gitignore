@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Build output (generated — GitHub builds this via Actions)
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS junk
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Environment (if you ever add private keys later)
+.env
+.env.local
+
+# Firebase CLI
+.firebase/
+firebase-debug.log
+firestore-debug.log
